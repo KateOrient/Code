@@ -55,34 +55,34 @@ public class Code{
 
     private int delBlock (int line, int position){
         String res;
-        if (isInString(line, position)){
-            return position+1;
-        }
-        int endLine = code.size() - 1;
-        int endPos = 0;
-        for (int i = line; i < code.size(); i++){
-            if ((endPos = code.get(i).indexOf(ASTERISK_SLASH,position+1)) != -1 && !isInString(i, endPos)){
-                endLine = i;
-                break;
+        if (!isInString(line, position)){
+            int endLine = code.size() - 1;
+            int endPos = 0;
+            for (int i = line; i < code.size(); i++){
+                if ((endPos = code.get(i).indexOf(ASTERISK_SLASH, position + 1)) != -1 && !isInString(i, endPos)){
+                    endLine = i;
+                    break;
+                }
             }
-        }
-        res = code.get(line).substring(0, position);
-        if (line == endLine){
-            res += code.get(line).substring(endPos + 2);
-            code.remove(line);
-        }
-        else{
+            res = code.get(line).substring(0, position);
+            if (line == endLine){
+                res += code.get(line).substring(endPos + 2);
+                code.remove(line);
+            }else{
                 code.add(line, res);
-            for (int i = line+1; i < endLine+1; i++){
-                code.remove(line+1);
+                for (int i = line + 1; i < endLine + 1; i++){
+                    code.remove(line + 1);
+                }
+                res = code.remove(line + 1).substring(endPos + 2);
+                if (code.get(line).matches("^[ \t\uFEFF]*$")){
+                    code.remove(line);
+                }
             }
-
-            res = code.remove(line+1).substring(endPos+2);
+            if (!res.matches("^[ \t\uFEFF]*$")){
+                code.add(line, res);
+            }
         }
-        if (!res.matches("^( |\t)*$")){
-            code.add(line, res);
-        }
-        return position+1;
+        return position + 1;
     }
 
 
@@ -102,7 +102,7 @@ public class Code{
         code.remove(line);
 
         res = new String(newChars);
-        if (!res.matches("^( |\t)*$")){
+        if (!res.matches("^[ \t\uFEFF]*$")){
             code.add(line, res);
         }
         return true;
